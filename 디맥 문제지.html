@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>DJMAX 그림 퀴즈</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #3b3b3b;
+      color: #eee;
+    }
+    img {
+      width: 300px;
+      height: auto;
+      margin-top: 20px;
+    }
+    .options {
+      margin-top: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .result {
+      font-size: 24px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .tier-img {
+      width: 200px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>DJMAX 그림 맞추기</h1>
+  <button id="start-btn" onclick="startGame()" style="padding: 12px 24px; font-size: 18px; margin-top: 20px;">게임 시작</button>
+  <div id="quiz-area" style="display:none;">
+    <div id="timer" style="font-size: 20px; margin-top: 10px; color: #ffcc00;"></div>
+    <img id="question-img" src="q1.png" alt="문제 이미지">
+    <div class="options" id="options"></div>
+    <div class="result" id="result"></div>
+    <div id="final-score"></div>
+    <img id="tier-img" class="tier-img" style="display:none;" alt="티어 이미지">
+  </div>
+<script>
+    let timeLeft = 180;
+    let quizOver = false;
+    let current = 0;
+    let score = 0;
+  const questions = [
+    {
+      img: "q1.jpg",
+      choices: ["Myosotis", "EMber", "AXION", "Les Parfums de L'Amour"],
+      answer: "Les Parfums de L'Amour"
+    },
+    {
+      img: "q2.jpg",
+      choices: ["DIE IN", "Nightmare", "Heart of Witch", "Midnight Blood"],
+      answer: "Nightmare"
+    },
+    {
+      img: "q3.jpg",
+      choices: ["After School Dessert", "Constant Moderato", "Operation☆DOTABATA!", "Luminous Memory"],
+      answer: "Constant Moderato"
+    },
+    {
+      img: "q4.jpg",
+      choices: ["Puzzler", "D2", "Grid System", "Put'Em Up"],
+      answer: "Puzzler"
+    },
+    {
+      img: "q5.jpg",
+      choices: ["Missing You ~SOPHI Remix~", "Story of Maple", "Start The Adventure ~SOPHI Remix~", "The Raindrop Flower ~jam-jam Remix~"],
+      answer: "Start The Adventure ~SOPHI Remix~"
+    },
+    {
+      img: "q6.jpg",
+      choices: ["The Little Adventurer", "Missing You ~SOPHI Remix~", "Star Bubble", "Smile"],
+      answer: "Smile"
+    },
+    {
+      img: "q7.jpg",
+      choices: ["Play the Future", "Electronics", "Cypher Gate", "Cyberozar"],
+      answer: "Electronics"
+    },
+    {
+      img: "q8.jpg",
+      choices: ["I've got a feeling", "Mad (feat. WaMi)", "Ready Now", "Colours of Sorrow"],
+      answer: "Mad (feat. WaMi)"
+    },
+    {
+      img: "q9.jpg",
+      choices: ["Dream", "Can We Talk", "Dream it", "Can We Talk (Broken Dog Leg Mix)"],
+      answer: "Can We Talk"
+    },
+    {
+      img: "q10.jpg",
+      choices: ["Ikazuchi", "죽음의 신 : 크로우 크루아흐", "최종무곡", "ouroboros -twin stroke of the end-"],
+      answer: "Ikazuchi"
+    },
+    {
+      img: "q11.jpg",
+      choices: ["Behemoth", "Remains Of Doom", "MonoXide", "Child of Night"],
+      answer: "Child of Night"
+    },
+    {
+      img: "q12.jpg",
+      choices: ["MonoXide", "Cherokee", "최종무곡", "Cthugha"],
+      answer: "Cthugha"
+    },
+    {
+      img: "q13.jpg",
+      choices: ["Sparrow", "Kung-Fu Rider", "Urban Night", "OrBiTal"],
+      answer: "Sparrow"
+    },
+    {
+      img: "q14.jpg",
+      choices: ["Yodeling in meadow hill (Hidden Retreat)", "Tekken Tag Tournament Piano Intro -Massive True Mix-", "Kitsch", "Fiji -Paraiso Mix- (Eternal Paradise)"],
+      answer: "Yodeling in meadow hill (Hidden Retreat)"
+    },
+    {
+      img: "q15.jpg",
+      choices: ["Melonaid", "Secret", "My Wonderland", "Hypernaid"],
+      answer: "My Wonderland"
+    },
+    {
+      img: "q16.jpg",
+      choices: ["Tekken Tag Tournament Piano Intro -Massive True Mix-", "Empty Your Mind 1st", "Moonsiders 1st", "Moonlit Wilderness"],
+      answer: "Tekken Tag Tournament Piano Intro -Massive True Mix-"
+    },
+    {
+      img: "q17.jpg",
+      choices: ["Lacheln, The City of Dreams", "Labyrinth of Tears", "The Lake of Oblivion ~jam-jam Remix~", "Story of Maple"],
+      answer: "Lacheln, The City of Dreams"
+    },
+    {
+      img: "q18.jpg",
+      choices: ["Desperado ~Nu Skool Mix~", "Fly Away", "Labyrinth of Tears", "Kingdom"],
+      answer: "Kingdom"
+    },
+    {
+      img: "q19.jpg",
+      choices: ["Give Me 5", "Love Mode", "Hanz up!", "Flea"],
+      answer: "Hanz up!"
+    },
+    {
+      img: "q20.jpg",
+      choices: ["DJMAX", "Yo! Max!", "The MAX", "Never Ending TECHNIKA"],
+      answer: "DJMAX"
+    },
+    {
+      img: "q21.jpg",
+      choices: ["PUPA", "PUPA (xi Remix)", "Blue Destination", "BlueWhite"],
+      answer: "PUPA"
+    },
+    {
+      img: "q22.jpg",
+      choices: ["Love or Die", "Won't Back Down", "Set Me Free", "Sweet Dream"],
+      answer: "Set Me Free"
+    },
+    {
+      img: "q23.jpg",
+      choices: ["Groove Prayer", "OVER THE NIGHT", "HB-axeleration", "Comet Coaster"],
+      answer: "Groove Prayer"
+    },
+    {
+      img: "q24.jpg",
+      choices: ["B!G-BANG CHALLENGE", "ECiLA", "ALiCE", "ELIXIR"],
+      answer: "ELIXIR"
+    },
+    {
+      img: "q25.jpg",
+      choices: ["EMber", "LIMBO", "AXION", "HELIX"],
+      answer: "HELIX"
+    },
+    {
+      img: "q26.jpg",
+      choices: ["My Wonderland", "Voyage", "Color", "Secret"],
+      answer: "Secret"
+    },
+    {
+      img: "q27.jpg",
+      choices: ["Airlock", "Airwave", "Airwave ~Extended Mix~", "Stay"],
+      answer: "Airlock"
+    },
+    {
+      img: "q28.jpg",
+      choices: ["The Decisive Blow (Normal)", "Behemoth", "My Last Stand", "Empty Your Mind 1st"],
+      answer: "Behemoth"
+    },
+    {
+      img: "q29.jpg",
+      choices: ["To the Future.", "The Universe", "Renovation", "Vile Requiem"],
+      answer: "Vile Requiem"
+    },
+    {
+      img: "q30.jpg",
+      choices: ["We're All Gonna Die", "Never Die", "Don't Cry", "Don't Die"],
+      answer: "Don't Die"
+    },
+    {
+      img: "q31.jpg",
+      choices: ["ON", "Mr.Lonely", "Remember Me", "SURVIVOR"],
+      answer: "ON"
+    },
+    {
+      img: "q32.jpg",
+      choices: ["너에게", "Watch Your Step", "피아노 협주곡 1번", "모짜르트 교향곡 40번 1악장"],
+      answer: "모짜르트 교향곡 40번 1악장"
+    }
+    ];
+    function startGame() {
+        document.getElementById("start-btn").style.display = "none";
+        document.getElementById("quiz-area").style.display = "block";
+        showQuestion();
+        updateTimer();
+    }
+
+    function updateTimer() {
+      const timerDiv = document.getElementById("timer");
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDiv.textContent = `남은 시간: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      if (timeLeft <= 0) {
+        document.getElementById("result").textContent = "시간 초과!";
+        document.getElementById("result").style.color = "orange";
+        quizOver = true;
+        setTimeout(endQuiz, 1000);
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    }
+
+    function checkAnswer(choice) {
+      if (quizOver) return;
+
+      const q = questions[current];
+      const result = document.getElementById("result");
+
+      if (choice === q.answer) {
+        result.textContent = "MAX 100%";
+        result.style.color = "orange";
+        score++;
+      } else {
+        result.textContent = "BREAK";
+        result.style.color = "red";
+      }
+
+      setTimeout(() => {
+        current++;
+        if (current < questions.length) {
+          showQuestion();
+        } else {
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question-img").src = q.img;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      document.getElementById("result").textContent = "";
+      document.getElementById("final-score").textContent = "";
+      document.getElementById("tier-img").style.display = "none";
+
+      q.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+        btn.onclick = () => checkAnswer(choice);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function endQuiz() {
+      document.getElementById("question-img").style.display = "none";
+      document.getElementById("options").style.display = "none";
+      document.getElementById("result").textContent = "";
+      document.getElementById("final-score").textContent = `총 ${questions.length}문제 중 ${score}문제 맞춤!`;
+
+      const tierImg = document.getElementById("tier-img");
+      let tier = "";
+      if (score <= 20) tier = "stamp.jpg";
+      else if (score <= 26) tier = "bronze.png";
+      else if (score <= 31) tier = "silver.png";
+      else tier = "gold.png";
+
+      tierImg.src = tier;
+      tierImg.style.display = "block";
+    }
+
+  </script>
+</body>
+</html>
